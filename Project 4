@@ -1,0 +1,20 @@
+from lib import data, plot_map
+
+data = data()
+
+# Extract latitude, longitude, and 2m temperature
+latitude = data[0]['latitude'].values
+longitude = data[0]['longitude'].values
+T_2m = data[1]['t2m'] - 273   # Convert to Celsius
+
+# Create base map
+ax = plot_map(longitude, latitude)
+
+# Plot temperature field
+T_2m.plot(ax=ax,
+          transform=ccrs.PlateCarree(),
+          cmap='bwr',
+          cbar_kwargs={'label': 'Temperature (°C)'})
+
+ax.set_title('2m Surface Temperature')
+plt.show()
