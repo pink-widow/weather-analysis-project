@@ -1,0 +1,43 @@
+import numpy as np
+from lib import data, plot_map
+
+data = data()
+
+# Extract latitude, longitude, geopotential, and temperature
+latitude = data[0]['latitude'].values
+longitude = data[0]['longitude'].values
+h = data[0]['z'].values
+T = data[0]['t'].values
+
+# Convert temperature from Kelvin to Celsius
+T_500 = T[0, 1] - 273
+
+# Create base map
+ax = plot_map(longitude, latitude)
+
+# Plot geopotential height contour lines
+contour_levels = np.arange(np.min(h[0, 1]),
+                           np.max(h[0, 1]), 150)
+
+cs = ax.contour(longitude, latitude, h[0, 1],
+                levels=contour_levels,
+                colors='green',
+                linewidths=1,
+                transform=ccrs.PlateCarree())
+
+ax.clabel(cs, inline=True, fontsize=8, fmt='%1.0f')
+
+# Plot temperature contour lines (isotherms)
+isotherm_levels = np.arange(np.min(T_500),
+                            np.max(T_500), 5)
+
+ct = ax.contour(longitude, latitude, T_500,
+                levels=isotherm_levels,
+                colors='blue',
+                linewidths=1,
+                transform=ccrs.PlateCarree())
+
+ax.clabel(ct, inline=True, fontsize=8, fmt='%1.0f')
+
+ax.set_title('500 hPa Geopotential Height and Temperature')
+plt.show()
