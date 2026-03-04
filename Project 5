@@ -1,0 +1,44 @@
+from scipy import ndimage
+from lib import data, plot_map
+
+data = data()
+
+# Extract variables
+latitude = data[1]['latitude'].values
+longitude = data[1]['longitude'].values
+mslp = data[1]['msl'].values * 0.01   # Convert to hPa
+u = data[1]['u10'].values
+v = data[1]['v10'].values
+
+# Apply Gaussian smoothing to pressure field
+mslp_smooth = ndimage.gaussian_filter(mslp[0], sigma=2)
+
+# Subsample for clarity
+latitude = latitude[::5]
+longitude = longitude[::5]
+u = u[0, ::5, ::5]
+v = v[0, ::5, ::5]
+mslp_smooth = mslp_smooth[::5, ::5]
+
+# Create base map
+ax = plot_map(longitude, latitude)
+
+# Plot wind vectors
+ax.quiver(longitude, latitude, u, v,
+          transform=ccrs.PlateCarree(),
+          color='black')
+
+# Plot pressure contours
+contour_levels = np.arange(np.min(mslp_smooth),
+                           np.max(mslp_smooth), 5)
+
+cs = ax.contour(longitude, latitude, mslp_smooth,
+                levels=contour_levels,
+                colors='green',
+                linewidths=2,
+                transform=ccrs.PlateCarree())
+
+ax.clabel(cs, inline=True, fontsize=8, fmt='%1.0f')
+
+ax.set_title('Mean Sea Level Pressure and 10m Wind')
+plt.show()
