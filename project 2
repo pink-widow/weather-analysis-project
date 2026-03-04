@@ -1,0 +1,31 @@
+import xarray as xr
+import cartopy.crs as ccrs
+import matplotlib.pyplot as plt
+import numpy as np
+from lib import data, plot_map
+
+# Load datasets
+data = data()
+
+# Extract latitude, longitude, and wind components
+latitude = data[0]['latitude'].values
+longitude = data[0]['longitude'].values
+u = data[0]['u'].values
+v = data[0]['v'].values
+
+# Subsample data every 5 grid points for clearer visualization
+latitude = latitude[::5]
+longitude = longitude[::5]
+u = u[0, 2, ::5, ::5]   # 250 hPa level
+v = v[0, 2, ::5, ::5]
+
+# Create base map
+ax = plot_map(longitude, latitude)
+
+# Plot wind vectors
+ax.quiver(longitude, latitude, u, v,
+          transform=ccrs.PlateCarree(),
+          color='black')
+
+ax.set_title('250 hPa Wind Field')
+plt.show()
