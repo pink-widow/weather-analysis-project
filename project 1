@@ -1,0 +1,50 @@
+import xarray as xr
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Load NetCDF datasets (pressure-level and surface data)
+def data():
+    data1 = xr.open_dataset('pl20040523.nc')   # Pressure-level data
+    data2 = xr.open_dataset('sf20040523.nc')   # Surface instantaneous data
+    data3 = xr.open_dataset('tp20040523.nc')   # Total precipitation data
+    return [data1, data2, data3]
+
+# Create base geographic map
+def plot_map(longitude, latitude):
+    plt.figure(figsize=(10, 10))
+    ax = plt.axes(projection=ccrs.PlateCarree())
+
+    # Add coastlines
+    ax.add_feature(cfeature.COASTLINE, color='k')
+
+    # Add country borders
+    ax.add_feature(cfeature.BORDERS)
+
+    # Add oceans
+    ax.add_feature(cfeature.OCEAN, color='#88FFFF')
+
+    # Set geographic extent of the map
+    ax.set_extent([longitude.min(), longitude.max(),
+                   latitude.min(), latitude.max()],
+                  crs=ccrs.PlateCarree())
+
+    # Add gridlines with labels every 5 degrees
+    gl = ax.gridlines(crs=ccrs.PlateCarree(),
+                      draw_labels=True,
+                      xlocs=np.arange(longitude.min(), longitude.max(), 5),
+                      ylocs=np.arange(latitude.min(), latitude.max(), 5),
+                      linewidth=0.5, color='black', alpha=0.3)
+
+    # Mark Mashhad location
+    longitude_point = 59.6067
+    latitude_point = 36.2972
+    ax.scatter(longitude_point, latitude_point,
+               color='red', s=20, alpha=0.7,
+               transform=ccrs.PlateCarree())
+    ax.text(longitude_point, latitude_point,
+            'Mashhad', fontsize=12, color='red',
+            transform=ccrs.PlateCarree())
+
+    return ax
