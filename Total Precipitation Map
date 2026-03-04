@@ -1,0 +1,20 @@
+from lib import data, plot_map
+
+data = data()
+
+# Extract precipitation and convert to millimeters
+latitude = data[2]['latitude'].values
+longitude = data[2]['longitude'].values
+tp = data[2]['tp'] * 1000
+
+# Create base map
+ax = plot_map(longitude, latitude)
+
+# Plot accumulated precipitation
+tp.plot(ax=ax,
+        transform=ccrs.PlateCarree(),
+        cmap='YlGnBu',
+        cbar_kwargs={'label': 'Precipitation (mm)'})
+
+ax.set_title('Total Daily Precipitation')
+plt.show()
